@@ -16,10 +16,10 @@ function App() {
 
     const img = ctx.getImageData(0, 0, w, h)
 
-    const neighborhoods = (x: number, y: number, copy: Uint8ClampedArray): number => {
+    const neighborhoods = (x: number, y: number): number => {
       let n = 0
-      const get = (xx: number, yy: number): boolean => (
-        copy[(yy * w + xx) * 4 + 3] === 0xFF
+      const get = (x1: number, y1: number): boolean => (
+        img.data[(y1 * w + x1) * 4 + 3] === 0xFF
       )
       if (get(x - 1, y - 1)) n++
       if (get(x, y - 1)) n++
@@ -33,14 +33,14 @@ function App() {
     }
 
     const draw = (start?: boolean): void => {
-      img.data[((Math.floor(Math.random() * h) * w + Math.floor(Math.random() * w)) * 4) + 3] = 0xFF
       const copy = new Uint8ClampedArray(img.data)
+      copy[((Math.floor(Math.random() * h) * w + Math.floor(Math.random() * w)) * 4) + 3] = 0xFF
       ctx.clearRect(0, 0, w, h)
       for (let x = 0; x < w; x++) {
         for (let y = 0; y < h; y++) {
           const p = (y * w + x) * 4
-          let alive = img.data[p + 3] === 0xFF
-          const n = neighborhoods(x, y, copy)
+          let alive = copy[p + 3] === 0xFF
+          const n = neighborhoods(x, y)
           if (alive) {
             alive = !(n < 2 || n > 3)
           } else {
@@ -48,11 +48,12 @@ function App() {
           }
           if (start) {
             alive = Math.random() > 0.2
-            img.data[p] = x * 0xFF / w
+            copy[p] = x * 0xFF / w
           }
-          img.data[p + 3] = alive ? 0xFF : 0x00
+          copy[p + 3] = alive ? 0xFF : 0x00
         }
       }
+      img.data.set(copy)
       ctx.putImageData(img, 0, 0)
       setTimeout(draw, 0)
     }
