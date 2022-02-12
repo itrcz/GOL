@@ -47,7 +47,7 @@ function App() {
             alive = n === 3
           }
           if (start) {
-            alive = Math.random() > 0.2
+            alive = Math.random() > 0.9
             copy[p] = x * 0xFF / w
           }
           copy[p + 3] = alive ? 0xFF : 0x00
@@ -55,7 +55,7 @@ function App() {
       }
       img.data.set(copy)
       ctx.putImageData(img, 0, 0)
-      setTimeout(draw, 0)
+      setTimeout(draw, 25)
     }
     draw(true)
   }, [])
